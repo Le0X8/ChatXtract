@@ -2,7 +2,7 @@
 
 A fast & easy way to extract all of your WhatsApp chats!
 
-![Made with heart](https://img.shields.io/badge/Made%20with-%E2%9D%A4-f00?style=for-the-badge)![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/Le0X8/chatxtract?style=for-the-badge)![GitHub pull requests](https://img.shields.io/github/issues-pr/Le0X8/chatxtract?style=for-the-badge)![GitHub Repo stars](https://img.shields.io/github/stars/Le0X8/chatxtract?style=for-the-badge)
+![Made with heart](https://img.shields.io/badge/Made%20with-%E2%9D%A4-f00?style=for-the-badge) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/Le0X8/chatxtract?style=for-the-badge) ![GitHub pull requests](https://img.shields.io/github/issues-pr/Le0X8/chatxtract?style=for-the-badge) ![GitHub Repo stars](https://img.shields.io/github/stars/Le0X8/chatxtract?style=for-the-badge)
 
 ## Setting up
 

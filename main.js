@@ -1,9 +1,6 @@
 // EDIT HERE
-const id = 12750;//Math.random() * 10**5 |0;// needs tests
+const id = 12750;
 // EDIT HERE
-
-/**working directory*/
-const wd = `./loot/${id}/`;
 
 const fs = require('fs');
 const qrcode = require('qrcode-terminal');
@@ -25,74 +22,81 @@ const writeJSON = (path, x, callback) => fs.writeFile(
     callback
 );
 
+const main = () => {
+    /**working directory*/
+    const wd = `./loot/${id}/`;
 
-fs.mkdirSync(wd + 'chats', {recursive:true});
+    fs.mkdirSync(wd + 'chats', {recursive: true});
 
-client.on('qr', qr => { qrcode.generate(qr, {small: true}) });
+    client.on('qr', qr => { qrcode.generate(qr, {small: true}) });
 
-client.on('ready', () => {
-    console.log('Authenticated successfully.');
-    prompt('Press [ENTER] when sync has ended. ');
+    client.on('ready', () => {
+        console.log('Authenticated successfully.');
+        prompt('Press [ENTER] when sync has ended. ');
 
-    let mediacount = 0;
+        let mediacount = 0;
 
-    writeJSON(wd + 'clientinfo', client.info, (e) => {
-        if (e != null) console.error('An error occurred: ' + e);
-        else console.log('Written client info successfully.');
-    });
-
-    client.getContacts().then(x => writeJSON(
-        wd + 'contacts',
-        x,
-        (e) => {
+        writeJSON(wd + 'clientinfo', client.info, (e) => {
             if (e != null) console.error('An error occurred: ' + e);
-            else console.log('Written contacts successfully.');
-        }
-    ));
+            else console.log('Written client info successfully.');
+        });
 
-    client.getChats().then(val => {
-        writeJSON(
-            wd + 'chats',
-            val,
+        client.getContacts().then(x => writeJSON(
+            wd + 'contacts',
+            x,
             (e) => {
                 if (e != null) console.error('An error occurred: ' + e);
-                else console.log('Written chat history successfully.');
+                else console.log('Written contacts successfully.');
             }
-        );
-        val.forEach(chat => {
-            const chatID = wd + 'chats/' + chat.id._serialized;
+        ));
 
-            chat.fetchMessages({limit: 100000}).then(mval => {
-                writeJSON(
-                    chatID,
-                    mval,
-                    (e) => {
-                        if (e != null) console.error('An error occurred: ' + e);
-                        else console.log('Written chat list successfully.');
-                    }
-                );
-                mval.forEach(message => {
-                    if (!message.hasMedia) return; // using guard clause, to avoid indent
+        client.getChats().then(val => {
+            writeJSON(
+                wd + 'chats',
+                val,
+                (e) => {
+                    if (e != null) console.error('An error occurred: ' + e);
+                    else console.log('Written chat history successfully.');
+                }
+            );
+            val.forEach(chat => {
+                const chatID = wd + 'chats/' + chat.id._serialized;
 
-                    fs.mkdirSync(chatID, {recursive:true});
+                chat.fetchMessages({limit: 100000}).then(mval => {
+                    writeJSON(
+                        chatID,
+                        mval,
+                        (e) => {
+                            if (e != null) console.error('An error occurred: ' + e);
+                            else console.log('Written chat list successfully.');
+                        }
+                    );
+                    mval.forEach(message => {
+                        if (!message.hasMedia) return; // using guard clause, to avoid indent
 
-                    message.downloadMedia().then(file => {
-                        if (!file) return;
+                        fs.mkdirSync(chatID, {recursive: true});
 
-                        fs.writeFile(
-                            `${chatID}/${message.id.id}.${file.mimetype.replaceAll('/', 'Slash')}`,
-                            Buffer.from(file.data, 'base64'),
-                            null,
-                            (e) => {
-                                if (e != null) console.error('An error occurred: ' + e);
-                                else {mediacount++; console.log(`Downloaded media successfully. (${mediacount})`);};
-                            }
-                        );
-                    })
+                        message.downloadMedia().then(file => {
+                            if (!file) return;
+
+                            fs.writeFile(
+                                `${chatID}/${message.id.id}.${file.mimetype.replaceAll('/', 'Slash')}`,
+                                Buffer.from(file.data, 'base64'),
+                                null,
+                                (e) => {
+                                    if (e != null) console.error('An error occurred: ' + e);
+                                    else {mediacount++; console.log(`Downloaded media successfully. (${mediacount})`);};
+                                }
+                            );
+                        })
+                    });
                 });
             });
         });
     });
-});
 
-client.initialize();
+    client.initialize();
+}
+
+if (require?.main === module)
+    main();

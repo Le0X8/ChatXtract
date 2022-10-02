@@ -8,7 +8,7 @@ A fast & easy way to extract all of your WhatsApp chats!
 
 1. Install [Node.JS](https://nodejs.org/en/download/)
 2. Clone the repository the way you like it.
-3. Install some required packages using ```npm install fs qrcode-terminal whatsapp-web.js```
+3. Install some required packages using ```npm install fs qrcode-terminal whatsapp-web.js prompt-sync```
 4. You're ready to run ChatXtract now.
 
 

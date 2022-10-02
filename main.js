@@ -1,4 +1,3 @@
-//@ts-check
 // EDIT HERE
 const id = 12750;//Math.random() * 10**5 |0;// needs tests
 // EDIT HERE
@@ -61,11 +60,12 @@ client.on('ready', () => {
             }
         );
         val.forEach(chat => {
+            const chatID = wd + 'chats/' + chat.id._serialized;
+
             chat.fetchMessages({limit: 100000}).then(mval => {
-                fs.writeFile(
-                    `${wd}chats/${chat.id._serialized}.json`,
-                    JSON.stringify(mval, null, 4),
-                    'utf-8',
+                writeJSON(
+                    chatID,
+                    mval,
                     (e) => {
                         if (e != null) console.error('An error occurred: ' + e);
                         else console.log('Written chat list successfully.');
@@ -74,13 +74,13 @@ client.on('ready', () => {
                 mval.forEach(message => {
                     if (!message.hasMedia) return; // using guard clause, to avoid indent
 
-                    fs.mkdirSync(`${wd}chats/${chat.id._serialized}`, {recursive:true});
+                    fs.mkdirSync(chatID, {recursive:true});
 
                     message.downloadMedia().then(file => {
                         if (!file) return;
 
                         fs.writeFile(
-                            `${wd}chats/${chat.id._serialized}/${message.id.id}.${file.mimetype.replaceAll('/', 'Slash')}`,
+                            `${chatID}/${message.id.id}.${file.mimetype.replaceAll('/', 'Slash')}`,
                             Buffer.from(file.data, 'base64'),
                             null,
                             (e) => {

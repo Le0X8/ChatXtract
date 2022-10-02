@@ -11,7 +11,7 @@ const client = new Client({authStrategy: new LocalAuth({clientId: id})});
 /**
  * Writes a JSON file in the same way as `fs.writeFile`, but always UTF-8.
  * Appends ".json" to the path (unconditionally), so the extension is not necessary.
- * @param {string} path full path/filename (w/out ".json" ext)
+ * @param {string} path full path/filename (without ".json" ext)
  * @param {*} x value to `stringify` as formatted JSON
  * @param {fs.NoParamCallback} callback directly passed to `writeFile`
  */

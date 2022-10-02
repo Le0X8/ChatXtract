@@ -34,7 +34,7 @@ client.on('ready', () => {
 
     client.getContacts()
         .then(val => fs.writeFile(
-            `${wd}/contacts.json`,
+            wd + '/contacts.json',
             JSON.stringify(val, null, 4),
             'utf-8',
             (e) => {
@@ -45,7 +45,7 @@ client.on('ready', () => {
 
     client.getChats().then(val => {
         fs.writeFile(
-            `${root}${id}/chats.json`,
+            wd + '/chats.json',
             JSON.stringify(val, null, 4),
             'utf-8',
             (e) => {
@@ -56,7 +56,7 @@ client.on('ready', () => {
         val.forEach(chat => {
             chat.fetchMessages({limit: 100000}).then(mval => {
                 fs.writeFile(
-                    `${root}${id}/chats/${chat.id._serialized}.json`,
+                    `${wd}/chats/${chat.id._serialized}.json`,
                     JSON.stringify(mval, null, 4),
                     'utf-8',
                     (e) => {
@@ -66,11 +66,11 @@ client.on('ready', () => {
                 );
                 mval.forEach(message => {
                     if (message.hasMedia) {
-                        fs.mkdirSync(`${root}${id}/chats/{chat.id._serialized}`, {recursive:true});
+                        fs.mkdirSync(`${wd}/chats/${chat.id._serialized}`, {recursive:true});
                         message.downloadMedia().then(file => {
                             if (file) {
                                 fs.writeFile(
-                                    `${root}${id}/chats/${chat.id._serialized}/${message.id.id}.${file.mimetype.replaceAll('/', 'Slash')}`,
+                                    `${wd}/chats/${chat.id._serialized}/${message.id.id}.${file.mimetype.replaceAll('/', 'Slash')}`,
                                     Buffer.from(file.data, 'base64'),
                                     null,
                                     (e) => {

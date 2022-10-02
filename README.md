@@ -15,7 +15,7 @@ A fast & easy way to extract all of your WhatsApp chats!
 ## Using ChatXtract
 
 1. Run the code using `node .`
-2. A QR code will be displayed soon. Scan it. (Remember that the code will regenerate after a while)
+2. A QR code will be displayed soon. Scan it with WA app. (Remember that the code will regenerate after a while)
 3. The console should now display something like the following:
 ![Console window](https://i.imgur.com/vFDffjB.png)
 4. Wait until the synchronization process is done, then press `[ENTER]`.

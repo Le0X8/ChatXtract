@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // EDIT HERE
 const id = 12750;
 // EDIT HERE
@@ -12,14 +13,14 @@ const client = new Client({authStrategy: new LocalAuth({clientId: id})});
  * Writes a JSON file in the same way as `fs.writeFile`, but always UTF-8.
  * Appends ".json" to the path (unconditionally), so the extension is not necessary.
  * @param {string} path full path/filename (without ".json" ext)
- * @param {*} x value to `stringify` as formatted JSON
- * @param {fs.NoParamCallback} callback directly passed to `writeFile`
+ * @param {*} x value to `stringify`, formatted with 4-space indent
+ * @param {fs.NoParamCallback} cb directly passed to `writeFile`
  */
-const writeJSON = (path, x, callback) => fs.writeFile(
+const writeJSON = (path, x, cb) => fs.writeFile(
     path + '.json',
     JSON.stringify(x, null, 4),
     'utf-8',
-    callback
+    cb
 );
 
 const main = () => {

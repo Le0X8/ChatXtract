@@ -3,14 +3,29 @@
 const id = 12750;//Math.random() * 10**5 |0;// needs tests
 // EDIT HERE
 
-const root = './loot/';
-const wd = root + id + '/'; // working dir
+/**working directory*/
+const wd = `./loot/${id}/`;
 
 const fs = require('fs');
 const qrcode = require('qrcode-terminal');
 const prompt = require("prompt-sync")();
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const client = new Client({authStrategy: new LocalAuth({clientId: id})});
+
+/**
+ * Writes a JSON file in the same way as `fs.writeFile`, but always UTF-8.
+ * Appends ".json" to the path (unconditionally), so the extension is not necessary.
+ * @param {string} path full path/filename (w/out ".json" ext)
+ * @param {*} x value to `stringify` as formatted JSON
+ * @param {fs.NoParamCallback} callback directly passed to `writeFile`
+ */
+const writeJSON = (path, x, callback) => fs.writeFile(
+    path + '.json',
+    JSON.stringify(x, null, 4),
+    'utf-8',
+    callback
+);
+
 
 fs.mkdirSync(wd + 'chats', {recursive:true});
 
@@ -22,20 +37,14 @@ client.on('ready', () => {
 
     let mediacount = 0;
 
-    fs.writeFile(
-        wd + 'clientinfo.json',
-        JSON.stringify(client.info, null, 4),
-        'utf-8',
-        (e) => {
-            if (e != null) console.error('An error occurred: ' + e);
-            else console.log('Written client info successfully.');
-        }
-    );
+    writeJSON(wd + 'clientinfo', client.info, (e) => {
+        if (e != null) console.error('An error occurred: ' + e);
+        else console.log('Written client info successfully.');
+    });
 
-    client.getContacts().then(val => fs.writeFile(
-        wd + 'contacts.json',
-        JSON.stringify(val, null, 4),
-        'utf-8',
+    client.getContacts().then(x => writeJSON(
+        wd + 'contacts',
+        x,
         (e) => {
             if (e != null) console.error('An error occurred: ' + e);
             else console.log('Written contacts successfully.');
@@ -43,10 +52,9 @@ client.on('ready', () => {
     ));
 
     client.getChats().then(val => {
-        fs.writeFile(
-            wd + 'chats.json',
-            JSON.stringify(val, null, 4),
-            'utf-8',
+        writeJSON(
+            wd + 'chats',
+            val,
             (e) => {
                 if (e != null) console.error('An error occurred: ' + e);
                 else console.log('Written chat history successfully.');

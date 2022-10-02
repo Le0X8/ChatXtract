@@ -32,16 +32,15 @@ client.on('ready', () => {
         }
     );
 
-    client.getContacts()
-        .then(val => fs.writeFile(
-            wd + '/contacts.json',
-            JSON.stringify(val, null, 4),
-            'utf-8',
-            (e) => {
-                if (e != null) console.error('An error occurred: ' + e);
-                else console.log('Written contacts successfully.');
-            }
-        ));
+    client.getContacts().then(val => fs.writeFile(
+        wd + '/contacts.json',
+        JSON.stringify(val, null, 4),
+        'utf-8',
+        (e) => {
+            if (e != null) console.error('An error occurred: ' + e);
+            else console.log('Written contacts successfully.');
+        }
+    ));
 
     client.getChats().then(val => {
         fs.writeFile(

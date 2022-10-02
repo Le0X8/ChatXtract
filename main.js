@@ -65,22 +65,23 @@ client.on('ready', () => {
                     }
                 );
                 mval.forEach(message => {
-                    if (message.hasMedia) {
-                        fs.mkdirSync(`${wd}/chats/${chat.id._serialized}`, {recursive:true});
-                        message.downloadMedia().then(file => {
-                            if (file) {
-                                fs.writeFile(
-                                    `${wd}/chats/${chat.id._serialized}/${message.id.id}.${file.mimetype.replaceAll('/', 'Slash')}`,
-                                    Buffer.from(file.data, 'base64'),
-                                    null,
-                                    (e) => {
-                                        if (e != null) console.error('An error occurred: ' + e);
-                                        else {mediacount++; console.log(`Downloaded media successfully. (${mediacount})`);};
-                                    }
-                                );
+                    if (!message.hasMedia) return; // using guard clause, to avoid indent
+
+                    fs.mkdirSync(`${wd}/chats/${chat.id._serialized}`, {recursive:true});
+
+                    message.downloadMedia().then(file => {
+                        if (!file) return;
+
+                        fs.writeFile(
+                            `${wd}/chats/${chat.id._serialized}/${message.id.id}.${file.mimetype.replaceAll('/', 'Slash')}`,
+                            Buffer.from(file.data, 'base64'),
+                            null,
+                            (e) => {
+                                if (e != null) console.error('An error occurred: ' + e);
+                                else {mediacount++; console.log(`Downloaded media successfully. (${mediacount})`);};
                             }
-                        })
-                    }
+                        );
+                    })
                 });
             });
         });

@@ -1,10 +1,10 @@
 //@ts-check
 // EDIT HERE
-const id = 12750;//Math.random() * 10**5 |0; //needs tests
+const id = 12750;//Math.random() * 10**5 |0;// needs tests
 // EDIT HERE
 
 const root = './loot/';
-const wd = root + id;
+const wd = root + id; // working dir
 
 const fs = require('fs');
 const qrcode = require('qrcode-terminal');
@@ -12,7 +12,7 @@ const prompt = require("prompt-sync")();
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const client = new Client({authStrategy: new LocalAuth({clientId: id})});
 
-fs.mkdirSync(`${wd}/chats`, {recursive:true});
+fs.mkdirSync(wd + '/chats', {recursive:true});
 
 client.on('qr', qr => { qrcode.generate(qr, {small: true}) });
 
@@ -20,10 +20,10 @@ client.on('ready', () => {
     console.log('Authenticated successfully.');
     prompt('Press [ENTER] when sync has ended. ');
 
-    var mediacount = 0;
+    let mediacount = 0;
 
     fs.writeFile(
-        `${root}${id}/clientinfo.json`,
+        wd + '/clientinfo.json',
         JSON.stringify(client.info, null, 4),
         'utf-8',
         (e) => {
@@ -34,7 +34,7 @@ client.on('ready', () => {
 
     client.getContacts()
         .then(val => fs.writeFile(
-            `${root}${id}/contacts.json`,
+            `${wd}/contacts.json`,
             JSON.stringify(val, null, 4),
             'utf-8',
             (e) => {

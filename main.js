@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+'use strict';
 // EDIT HERE
 const id = 12750;
 // EDIT HERE

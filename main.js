@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+'use strict';
 // EDIT HERE
 const id = 12750;
 // EDIT HERE
@@ -8,37 +10,95 @@ const prompt = require("prompt-sync")();
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const client = new Client({authStrategy: new LocalAuth({clientId: id})});
 
-if (!fs.existsSync('./loot')){fs.mkdirSync('./loot');};
-if (!fs.existsSync('./loot/' + id)){fs.mkdirSync('./loot/' + id);};
-if (!fs.existsSync('./loot/' + id + '/chats')){fs.mkdirSync('./loot/' + id + '/chats');};
+/**
+ * Writes a JSON file in the same way as `fs.writeFile`, but always UTF-8.
+ * Appends ".json" to the path (unconditionally), so the extension is not necessary.
+ * @param {string} path full path/filename (without ".json" ext)
+ * @param {*} x value to `stringify`, formatted with 4-space indent
+ * @param {fs.NoParamCallback} cb directly passed to `writeFile`
+ */
+const writeJSON = (path, x, cb) => fs.writeFile(
+    path + '.json',
+    JSON.stringify(x, null, 4),
+    'utf-8',
+    cb
+);
 
-client.on('qr', qr => {
-    qrcode.generate(qr, {small: true});
-});
+const main = () => {
+    /**working directory*/
+    const wd = `./loot/${id}/`;
 
-client.on('ready', () => {
-    console.log('Authenticated successfully.');
-    prompt('Press [ENTER] when sync has ended. ');
-    var mediacount = 0;
-    fs.writeFile('./loot/' + id + '/clientinfo.json', JSON.stringify(client.info, null, 4), 'utf-8', (e) => {if (e != null) {console.error('An error occurred: ' + e);} else {console.log('Written client info successfully.');};});
-    client.getContacts().then(val => fs.writeFile('./loot/' + id + '/contacts.json', JSON.stringify(val, null, 4), 'utf-8', (e) => {if (e != null) {console.error('An error occurred: ' + e);} else {console.log('Written contacts successfully.');};}));
-    client.getChats().then(val => {
-        fs.writeFile('./loot/' + id + '/chats.json', JSON.stringify(val, null, 4), 'utf-8', (e) => {if (e != null) {console.error('An error occurred: ' + e);} else {console.log('Written chat history successfully.');};});
-        val.forEach(chat => {
-            chat.fetchMessages({limit: 100000}).then(mval => {
-                fs.writeFile('./loot/' + id + '/chats/' + chat.id._serialized + '.json', JSON.stringify(mval, null, 4), 'utf-8', (e) => {if (e != null) {console.error('An error occurred: ' + e);} else {console.log('Written chat list successfully.');};});
-                mval.forEach(message => {if (message.hasMedia) {
-                    if (!fs.existsSync('./loot/' + id + '/chats/' + chat.id._serialized)){fs.mkdirSync('./loot/' + id + '/chats/' + chat.id._serialized);};
-                    message.downloadMedia().then(file => {
-                        if (file) {
-                            fs.writeFile('./loot/' + id + '/chats/' + chat.id._serialized + '/' + message.id.id + '.' + file.mimetype.replaceAll('/', 'Slash'), Buffer.from(file.data, 'base64'), 'utf-8', (e) => {if (e != null) {console.error('An error occurred: ' + e);} else {mediacount++; console.log('Downloaded media successfully. (' + mediacount + ')');};});
-                        };
-                    })
-                };
+    fs.mkdirSync(wd + 'chats', {recursive: true});
+
+    client.on('qr', qr => { qrcode.generate(qr, {small: true}) });
+
+    client.on('ready', () => {
+        console.log('Authenticated successfully.');
+        prompt('Press [ENTER] when sync has ended. ');
+
+        let mediacount = 0;
+
+        writeJSON(wd + 'clientinfo', client.info, (e) => {
+            if (e != null) console.error('An error occurred: ' + e);
+            else console.log('Written client info successfully.');
+        });
+
+        client.getContacts().then(x => writeJSON(
+            wd + 'contacts',
+            x,
+            (e) => {
+                if (e != null) console.error('An error occurred: ' + e);
+                else console.log('Written contacts successfully.');
+            }
+        ));
+
+        client.getChats().then(val => {
+            writeJSON(
+                wd + 'chats',
+                val,
+                (e) => {
+                    if (e != null) console.error('An error occurred: ' + e);
+                    else console.log('Written chat history successfully.');
+                }
+            );
+            val.forEach(chat => {
+                const chatID = wd + 'chats/' + chat.id._serialized;
+
+                chat.fetchMessages({limit: 100000}).then(mval => {
+                    writeJSON(
+                        chatID,
+                        mval,
+                        (e) => {
+                            if (e != null) console.error('An error occurred: ' + e);
+                            else console.log('Written chat list successfully.');
+                        }
+                    );
+                    mval.forEach(message => {
+                        if (!message.hasMedia) return; // using guard clause, to avoid indent
+
+                        fs.mkdirSync(chatID, {recursive: true});
+
+                        message.downloadMedia().then(file => {
+                            if (!file) return;
+
+                            fs.writeFile(
+                                `${chatID}/${message.id.id}.${file.mimetype.replaceAll('/', 'Slash')}`,
+                                Buffer.from(file.data, 'base64'),
+                                null,
+                                (e) => {
+                                    if (e != null) console.error('An error occurred: ' + e);
+                                    else {mediacount++; console.log(`Downloaded media successfully. (${mediacount})`);};
+                                }
+                            );
+                        })
+                    });
                 });
             });
         });
     });
-});
 
-client.initialize();
+    client.initialize();
+}
+
+if (require?.main === module)
+    main();
